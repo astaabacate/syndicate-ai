@@ -1,98 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import Header from './components/Header';
-import PainelVendasReais from './components/PainelVendasReais';
-import ListaProdutosReais from './components/ListaProdutosReais';
-import ModalProduto from './components/ModalProduto';
-import ModalCriar from './components/ModalCriar';
-import ModalExplicacao from './components/ModalExplicacao';
-import { PRODUTOS_INICIAIS } from './data/produtosReais';
+import React from 'react';
+import PainelAutoHustle from './components/PainelAutoHustle';
 
 export default function App() {
-  const [produtos, setProdutos] = useState(() => {
-    const salvo = localStorage.getItem('produtos_reais_v2');
-    if (salvo) {
-      try {
-        return JSON.parse(salvo);
-      } catch (e) {
-        console.error("Erro ao carregar dados", e);
-      }
-    }
-    return PRODUTOS_INICIAIS;
-  });
-
-  const [produtoSelecionado, setProdutoSelecionado] = useState(null);
-  const [modalCriarAberto, setModalCriarAberto] = useState(false);
-  const [modalAjudaAberto, setModalAjudaAberto] = useState(false);
-
-  useEffect(() => {
-    localStorage.setItem('produtos_reais_v2', JSON.stringify(produtos));
-  }, [produtos]);
-
-  const handleCriarProduto = (novo) => {
-    setProdutos(prev => [novo, ...prev]);
-    setProdutoSelecionado(novo);
-  };
-
-  const handleRegistrarVenda = (produtoId = null) => {
-    setProdutos(prev => prev.map(p => {
-      if (produtoId) {
-        if (p.id === produtoId) {
-          return { ...p, vendasReais: (p.vendasReais || 0) + 1 };
-        }
-        return p;
-      }
-      // Se não passou id, adiciona ao primeiro produto
-      if (p.id === prev[0].id) {
-        return { ...p, vendasReais: (p.vendasReais || 0) + 1 };
-      }
-      return p;
-    }));
-  };
-
   return (
     <div className="min-h-screen bg-[#0a0a0d] text-slate-100 flex flex-col font-sans antialiased selection:bg-emerald-500/20 selection:text-emerald-300">
       {/* Topo Limpo */}
-      <Header
-        onCriarNovo={() => setModalCriarAberto(true)}
-        onAbrirAjuda={() => setModalAjudaAberto(true)}
-      />
+      <header className="sticky top-0 z-40 bg-[#090a0f]/95 backdrop-blur-md border-b border-slate-800/80 px-4 py-3.5">
+        <div className="max-w-xl mx-auto flex items-center justify-between">
+          <div>
+            <h1 className="font-black text-base text-white tracking-tight leading-none">
+              AUTOHUSTLE<span className="text-emerald-400">.AI</span>
+            </h1>
+            <span className="text-[11px] text-slate-400">
+              Máquina de Renda Rápida de 1 Clique
+            </span>
+          </div>
+          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+            R$ 0 Custo • 100% Automático
+          </span>
+        </div>
+      </header>
 
-      {/* Conteúdo Central */}
+      {/* Conteúdo Principal */}
       <main className="flex-1 max-w-xl w-full mx-auto p-4 sm:p-5 space-y-4 pb-16">
-        {/* Painel Real de Vendas (Sem números falsos) */}
-        <PainelVendasReais
-          produtos={produtos}
-          onRegistrarVenda={() => handleRegistrarVenda()}
-        />
-
-        {/* Lista dos Produtos Prontos */}
-        <ListaProdutosReais
-          produtos={produtos}
-          onSelecionarProduto={(prod) => setProdutoSelecionado(prod)}
-        />
+        <PainelAutoHustle />
       </main>
-
-      {/* Modais */}
-      {produtoSelecionado && (
-        <ModalProduto
-          produto={produtoSelecionado}
-          onClose={() => setProdutoSelecionado(null)}
-          onRegistrarVendaProduto={(id) => handleRegistrarVenda(id)}
-        />
-      )}
-
-      {modalCriarAberto && (
-        <ModalCriar
-          onClose={() => setModalCriarAberto(false)}
-          onCriar={handleCriarProduto}
-        />
-      )}
-
-      {modalAjudaAberto && (
-        <ModalExplicacao
-          onClose={() => setModalAjudaAberto(false)}
-        />
-      )}
     </div>
   );
 }
