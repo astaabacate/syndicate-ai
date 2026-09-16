@@ -1,180 +1,166 @@
 import React, { useState } from 'react';
-import { X, DollarSign, Smartphone, Key, ShieldCheck, CheckCircle2, ChevronRight, Zap } from 'lucide-react';
+import { X, CheckCircle2, DollarSign, Smartphone, HelpCircle } from 'lucide-react';
 
 export default function ZeroCostGuideModal({ onClose }) {
-  const [activeSection, setActiveSection] = useState('zero_cost');
+  const [secao, setSecao] = useState('oque_vendemos');
 
-  const sections = [
-    { id: 'zero_cost', label: '1. Regra de R$ 0', icon: ShieldCheck },
-    { id: 'payments', label: '2. Receber em Dólar / Pix', icon: DollarSign },
-    { id: 'mobile', label: '3. Instalar no Celular', icon: Smartphone },
-    { id: 'ai_keys', label: '4. IA Gratuita (Gemini / Groq)', icon: Key }
+  const abas = [
+    { id: 'oque_vendemos', label: '1. O Que Vendemos?' },
+    { id: 'como_ganhar', label: '2. Como o Dinheiro Entra?' },
+    { id: 'passo_passo', label: '3. O Seu Dia a Dia' },
+    { id: 'instalar', label: '4. Usar no Celular' }
   ];
 
   return (
     <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
-        {/* Header */}
-        <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-950/60">
+      <div className="bg-[#0f121a] border border-slate-800 rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
+        {/* Cabeçalho */}
+        <div className="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/60">
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
-              Guia Operacional R$0 & Mobile
-            </span>
-            <h3 className="text-base font-bold text-white mt-1">
-              Como Operar 100% Grátis pelo Celular
+            <h3 className="text-sm font-bold text-white">
+              Manual Prático da Operação
             </h3>
+            <p className="text-xs text-slate-400">
+              Tudo explicado de forma simples e direta
+            </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Section Navigation */}
+        {/* Abas */}
         <div className="flex border-b border-slate-800 bg-slate-950/40 overflow-x-auto no-scrollbar">
-          {sections.map((sec) => {
-            const Icon = sec.icon;
-            return (
-              <button
-                key={sec.id}
-                onClick={() => setActiveSection(sec.id)}
-                className={`px-4 py-3 text-xs font-bold whitespace-nowrap flex items-center gap-1.5 border-b-2 transition ${
-                  activeSection === sec.id
-                    ? 'border-emerald-400 text-emerald-400 bg-slate-900'
-                    : 'border-transparent text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span>{sec.label}</span>
-              </button>
-            );
-          })}
+          {abas.map((a) => (
+            <button
+              key={a.id}
+              onClick={() => setSecao(a.id)}
+              className={`px-4 py-2.5 text-xs font-semibold whitespace-nowrap border-b-2 transition ${
+                secao === a.id
+                  ? 'border-emerald-400 text-emerald-400 bg-slate-900/40'
+                  : 'border-transparent text-slate-400 hover:text-slate-200'
+              }`}
+            >
+              {a.label}
+            </button>
+          ))}
         </div>
 
-        {/* Content Body */}
-        <div className="p-4 sm:p-6 space-y-4 max-h-[55vh] overflow-y-auto text-xs leading-relaxed text-slate-300 font-sans">
-          {activeSection === 'zero_cost' && (
+        {/* Conteúdo */}
+        <div className="p-4 sm:p-5 space-y-3 max-h-[50vh] overflow-y-auto text-xs text-slate-300 leading-relaxed">
+          {secao === 'oque_vendemos' && (
             <div className="space-y-3">
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>Como garantimos R$ 0 de custo em tudo:</span>
+              <h4 className="text-sm font-bold text-white">
+                O que você vende para o cliente?
               </h4>
               <p>
-                Este modelo de negócio foi estruturado para <strong>eliminar 100% de qualquer gasto fixo</strong>:
+                Imagine um empresário, consultor, advogado ou médico que grava um vídeo ou podcast de 40 minutos para o YouTube ou Spotify.
               </p>
-              <ul className="space-y-2 pl-2">
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>Sem domínio e sem hospedagem paga:</strong> Este painel web roda gratuitamente no Vercel/Cloudflare Pages (plano Free vitalício).</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>Sem banco de dados de leads pago (Apollo/ZoomInfo):</strong> Os podcasts divulgam seus emails de contato publicamente na descrição do canal no YouTube, no perfil do Spotify e no Substack.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>Sem ferramentas caras de automação (Make/Zapier pago):</strong> Todo o fluxo de geração, qualificação e disparo é executado diretamente por este aplicativo com 1 toque no celular.</span>
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-emerald-400 font-bold">✓</span>
-                  <span><strong>Sem risco de bloqueio de email:</strong> Não fazemos spam frio massivo. Enviamos abordagens manuais ultra-personalizadas com a amostra de valor já feita no corpo. 10 emails desse tipo geram mais vendas que 10.000 spams automáticos.</span>
-                </li>
-              </ul>
-            </div>
-          )}
-
-          {activeSection === 'payments' && (
-            <div className="space-y-3">
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <DollarSign className="w-4 h-4 text-emerald-400" />
-                <span>Como cobrar em Dólar ($) e cair na sua conta brasileira via Pix:</span>
-              </h4>
-              <p>
-                Vender para criadores dos EUA, Canadá e Europa é a maior alavanca financeira, pois <strong>$149 USD equivalem a cerca de R$ 815 BRL</strong> por cliente:
-              </p>
-              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
-                <p className="font-bold text-emerald-400">Opção 1: Stripe Payment Links (Recomendado)</p>
-                <p className="text-[11px] text-slate-400">
-                  Crie uma conta gratuita na Stripe (disponível para residentes no Brasil com CPF ou CNPJ). Você cria um "Link de Pagamento Recorrente" de $149/mês. O cliente gringo passa o cartão de crédito e a Stripe converte e deposita direto na sua conta bancária no Brasil. Custo: R$ 0 mensal (apenas taxa por transação bem-sucedida de ~3%).
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-amber-400 font-semibold block">O problema dele:</span>
+                <p>
+                  Quase ninguém tem 40 minutos para ver o vídeo inteiro. Esse empresário SABE que precisa postar resumos no LinkedIn e mandar uma newsletter por email para atrair clientes. <strong>Mas ele não tem tempo nem paciência para sentar e escrever.</strong>
                 </p>
               </div>
-              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
-                <p className="font-bold text-cyan-400">Opção 2: Wise (TransferWise)</p>
-                <p className="text-[11px] text-slate-400">
-                  Crie uma conta multimoeda na Wise gratuitamente. Ela te fornece dados bancários americanos (Routing Number e Account Number). O cliente transfere em dólares e você transfere para o seu Nubank/Inter via Pix em 2 segundos com IOF mínimo.
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-emerald-400 font-semibold block">O que você entrega:</span>
+                <p>
+                  Você se torna o parceiro de conteúdo dele. Toda semana ele grava o vídeo dele normal, e a nossa IA transforma aquele vídeo em:
                 </p>
-              </div>
-              <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
-                <p className="font-bold text-purple-400">Opção 3: Mercado Pago / Asaas / Pix (Para clientes do Brasil)</p>
-                <p className="text-[11px] text-slate-400">
-                  Para podcasters brasileiros, gere um link de assinatura Pix no Mercado Pago ou Asaas por R$ 490/mês.
-                </p>
+                <ul className="list-disc pl-4 space-y-1 text-slate-300 pt-1">
+                  <li><strong>1 Newsletter por email</strong> pronta para os clientes dele lerem;</li>
+                  <li><strong>3 Posts de alto nível para o LinkedIn</strong> dele;</li>
+                  <li><strong>Frases e roteiros curtos</strong> para as redes sociais.</li>
+                </ul>
               </div>
             </div>
           )}
 
-          {activeSection === 'mobile' && (
+          {secao === 'como_ganhar' && (
             <div className="space-y-3">
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <Smartphone className="w-4 h-4 text-emerald-400" />
-                <span>Como colocar este app na tela inicial do seu celular:</span>
+              <h4 className="text-sm font-bold text-white">
+                Como o dinheiro entra na sua conta?
+              </h4>
+              <p>
+                O cliente te paga uma <strong>mensalidade recorrente</strong> para você cuidar de todos os episódios que ele lançar no mês:
+              </p>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-white font-bold block">1. Clientes no Brasil:</span>
+                <p>
+                  Você cobra <strong>R$ 390 a R$ 490 por mês</strong> via Pix ou link de cartão (Mercado Pago, Asaas, Nubank).
+                </p>
+                <p className="text-emerald-400 font-medium pt-1">
+                  Exemplo: 5 clientes no Brasil = R$ 1.950 a R$ 2.450 líquidos caindo na sua conta todo mês.
+                </p>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <span className="text-white font-bold block">2. Clientes nos EUA (Mercado Gringo):</span>
+                <p>
+                  Criadores americanos pagam em dólar. O plano é de <strong>$149 dólares/mês</strong> por podcast (que equivale a cerca de R$ 800 na conversão). Você recebe direto via Stripe ou Wise na sua conta.
+                </p>
+                <p className="text-emerald-400 font-medium pt-1">
+                  Exemplo: 5 clientes gringos = $745 dólares (~R$ 4.090,00 por mês) trabalhando pelo celular.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {secao === 'passo_passo' && (
+            <div className="space-y-3">
+              <h4 className="text-sm font-bold text-white">
+                O que você faz no celular todo dia?
               </h4>
               <div className="space-y-2">
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <p className="font-bold text-slate-200">No Android (Google Chrome):</p>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Toque nos 3 pontinhos no canto superior direito do Chrome → Toque em <strong>"Adicionar à tela inicial"</strong> ou <strong>"Instalar aplicativo"</strong>. Ele se comportará como um app nativo, abrindo em tela cheia sem barras de navegador.
-                  </p>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                  <strong className="text-white">Passo 1:</strong> Você abre o aplicativo no celular e vai em <em>Fluxo de Vendas</em>.
                 </div>
-                <div className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <p className="font-bold text-slate-200">No iPhone (Safari):</p>
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Toque no botão de <strong>Compartilhar</strong> (quadrado com seta para cima) → Role para baixo e selecione <strong>"Adicionar à Tela de Início"</strong>.
-                  </p>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                  <strong className="text-white">Passo 2:</strong> Clica em <em>"Gerar Amostra Gratuita com IA"</em> no card de um criador. A IA escreve o material de graça.
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                  <strong className="text-white">Passo 3:</strong> Clica em <em>"Mandar Amostra (WhatsApp ou Email)"</em>. Você manda de presente para ele.
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                  <strong className="text-white">Passo 4:</strong> Ele vê que o trabalho ficou excelente sem você cobrar nada antes. Quando ele responder, você clica em <em>"O Criador Respondeu"</em> e manda a proposta de assinatura (R$ 390/mês).
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-950 border border-slate-800">
+                  <strong className="text-white">Passo 5:</strong> Quando ele pagar, você só gasta 2 minutos por semana gerando os novos textos para ele!
                 </div>
               </div>
             </div>
           )}
 
-          {activeSection === 'ai_keys' && (
+          {secao === 'instalar' && (
             <div className="space-y-3">
-              <h4 className="text-sm font-bold text-white flex items-center gap-2">
-                <Key className="w-4 h-4 text-emerald-400" />
-                <span>IA 100% Gratuita (Sem Cartão de Crédito):</span>
+              <h4 className="text-sm font-bold text-white">
+                Como usar na tela do celular como aplicativo:
               </h4>
               <p>
-                Este sistema já possui um <strong>motor semântico heurístico nativo</strong> que gera kits de conteúdo de altíssima qualidade sem precisar de nenhuma chave de API.
+                Depois que subir na Vercel (ou pelo navegador):
               </p>
-              <p>
-                Porém, se você quiser conectar uma LLM de ponta em tempo real, use os free tiers generosos que existem hoje:
-              </p>
-              <ul className="space-y-2">
-                <li className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <strong className="text-emerald-400">Google Gemini 2.0 Flash (Google AI Studio):</strong>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    1.500 requisições por dia 100% gratuitas, janela de 1 milhão de tokens. Não pede cartão de crédito. Acesse <code>aistudio.google.com</code> com sua conta Google e gere uma chave em 1 minuto.
-                  </p>
-                </li>
-                <li className="bg-slate-950 p-3 rounded-xl border border-slate-800">
-                  <strong className="text-cyan-400">Groq Cloud (Llama 3.3 70B):</strong>
-                  <p className="text-[11px] text-slate-400 mt-0.5">
-                    Incríveis 30 requisições por minuto gratuitas. Gera o kit inteiro em menos de 1 segundo. Acesse <code>console.groq.com</code> e crie uma chave grátis.
-                  </p>
-                </li>
-              </ul>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <strong className="text-white block">No Android (Chrome):</strong>
+                <p>Toque nos 3 pontinhos no canto superior direito → Toque em <strong>"Adicionar à tela inicial"</strong>.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 space-y-1">
+                <strong className="text-white block">No iPhone (Safari):</strong>
+                <p>Toque no ícone de compartilhar (quadrado com a setinha para cima) → Toque em <strong>"Adicionar à Tela de Início"</strong>.</p>
+              </div>
             </div>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="p-4 sm:p-5 border-t border-slate-800 bg-slate-950 flex justify-end">
+        {/* Rodapé */}
+        <div className="p-4 border-t border-slate-800 bg-slate-950/80 flex justify-end">
           <button
             onClick={onClose}
-            className="py-2.5 px-5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs"
+            className="py-2.5 px-4 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs"
           >
-            Entendido, ir para a Operação!
+            Entendido! Ir para o Painel
           </button>
         </div>
       </div>

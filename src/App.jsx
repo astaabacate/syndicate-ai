@@ -9,98 +9,77 @@ import DeliveryCenter from './components/DeliveryCenter';
 import OutreachModal from './components/OutreachModal';
 import ResponseProcessorModal from './components/ResponseProcessorModal';
 import ZeroCostGuideModal from './components/ZeroCostGuideModal';
-import { INITIAL_LEADS } from './data/mockLeads';
+import { CRIADORES_INICIAIS } from './data/mockLeads';
 import { generateContentKit } from './services/aiRepurposer';
 
 export default function App() {
-  // Persistence via localStorage
   const [leads, setLeads] = useState(() => {
-    const saved = localStorage.getItem('syndicate_leads_v1');
-    if (saved) {
+    const salvo = localStorage.getItem('syndicate_leads_v2');
+    if (salvo) {
       try {
-        return JSON.parse(saved);
+        return JSON.parse(salvo);
       } catch (e) {
-        console.error("Failed to parse saved leads", e);
+        console.error("Erro ao carregar dados salvos", e);
       }
     }
-    return INITIAL_LEADS;
+    return CRIADORES_INICIAIS;
   });
 
   const [activeTab, setActiveTab] = useState('pipeline');
-  const [filterStatus, setFilterStatus] = useState('all');
-  const [currency, setCurrency] = useState('USD');
-  const [selectedLeadId, setSelectedLeadId] = useState(INITIAL_LEADS[0].id);
+  const [filterStatus, setFilterStatus] = useState('todos');
+  const [selectedLeadId, setSelectedLeadId] = useState(CRIADORES_INICIAIS[0].id);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Modals
+  // Modais
   const [outreachModalLead, setOutreachModalLead] = useState(null);
   const [responseModalLead, setResponseModalLead] = useState(null);
   const [showGuideModal, setShowGuideModal] = useState(false);
 
-  // Sync to localStorage
   useEffect(() => {
-    localStorage.setItem('syndicate_leads_v1', JSON.stringify(leads));
+    localStorage.setItem('syndicate_leads_v2', JSON.stringify(leads));
   }, [leads]);
 
-  // Lead qualification action (1 click)
-  const handleQualifyLead = (id) => {
-    setLeads(prev => prev.map(lead => {
-      if (lead.id === id) {
-        return {
-          ...lead,
-          status: 'qualified',
-          qualificationScore: Math.floor(Math.random() * 10) + 90,
-          history: [
-            ...lead.history,
-            { date: new Date().toLocaleString(), action: "Qualificado automaticamente pela IA" }
-          ]
-        };
-      }
-      return lead;
-    }));
-  };
-
-  // Content generation action (1 click)
+  // Ação de 1 toque: Gerar Amostra Gratuita com IA
   const handleGenerateSample = async (id) => {
-    const targetLead = leads.find(l => l.id === id);
-    if (!targetLead) return;
+    const alvo = leads.find(l => l.id === id);
+    if (!alvo) return;
 
     setIsGenerating(true);
     setSelectedLeadId(id);
 
     try {
-      const kit = await generateContentKit({ lead: targetLead });
+      const kit = await generateContentKit({ lead: alvo });
       setLeads(prev => prev.map(lead => {
         if (lead.id === id) {
           return {
             ...lead,
-            status: lead.status === 'won' ? 'won' : 'sample_ready',
-            sampleKit: kit,
-            history: [
-              ...lead.history,
-              { date: new Date().toLocaleString(), action: "Kit de Amostra Multi-Canal gerado pela IA" }
+            status: lead.status === 'cliente_ativo' ? 'cliente_ativo' : 'amostra_pronta',
+            kitConteudo: kit,
+            historico: [
+              ...lead.historico,
+              `Amostra gratuita gerada com sucesso às ${new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}.`
             ]
           };
         }
         return lead;
       }));
     } catch (err) {
-      console.error("Error generating kit:", err);
+      console.error("Erro ao gerar amostra:", err);
     } finally {
       setIsGenerating(false);
     }
   };
 
-  // Outreach marked contacted
+  // Marcar como mensagem enviada
   const handleMarkContacted = (id) => {
     setLeads(prev => prev.map(lead => {
       if (lead.id === id) {
         return {
           ...lead,
-          status: 'contacted',
-          history: [
-            ...lead.history,
-            { date: new Date().toLocaleString(), action: "Abordagem com amostra enviada ao host" }
+          status: 'contatado',
+          historico: [
+            ...lead.historico,
+            `Mensagem com amostra enviada ao apresentador.`
           ]
         };
       }
@@ -108,76 +87,58 @@ export default function App() {
     }));
   };
 
-  // Advance to negotiating
-  const handleAdvanceToNegotiating = (id) => {
-    setLeads(prev => prev.map(lead => {
-      if (lead.id === id) {
-        return {
-          ...lead,
-          status: 'negotiating',
-          history: [
-            ...lead.history,
-            { date: new Date().toLocaleString(), action: "Objeção tratada e proposta de assinatura enviada" }
-          ]
-        };
-      }
-      return lead;
-    }));
-  };
-
-  // Mark deal as won (Client paid!)
+  // Fechar venda (Cliente pagou a assinatura mensal)
   const handleMarkWon = (id) => {
     setLeads(prev => prev.map(lead => {
       if (lead.id === id) {
         return {
           ...lead,
-          status: 'won',
-          history: [
-            ...lead.history,
-            { date: new Date().toLocaleString(), action: "Pagamento confirmado via Stripe! Novo cliente ativo" }
+          status: 'cliente_ativo',
+          historico: [
+            ...lead.historico,
+            `Pagamento mensal confirmado! Novo cliente ativo da carteira.`
           ]
         };
       }
       return lead;
     }));
 
-    // Trigger celebration confetti
     confetti({
-      particleCount: 120,
-      spread: 70,
+      particleCount: 100,
+      spread: 60,
       origin: { y: 0.6 }
     });
   };
 
-  // Add fresh lead
-  const handleAddLead = (newLead) => {
-    setLeads(prev => [newLead, ...prev]);
-    setSelectedLeadId(newLead.id);
+  // Adicionar novo criador
+  const handleAddLead = (novoLead) => {
+    setLeads(prev => [novoLead, ...prev]);
+    setSelectedLeadId(novoLead.id);
   };
 
-  // Weekly delivery generation for paying client
-  const handleGenerateWeeklyDelivery = async (clientId, { latestEpisode, transcriptSummary }) => {
-    const target = leads.find(l => l.id === clientId);
-    if (!target) return;
+  // Entrega semanal para cliente pagante
+  const handleGenerateWeeklyDelivery = async (clientId, { ultimoEpisodio, resumoConversa }) => {
+    const alvo = leads.find(l => l.id === clientId);
+    if (!alvo) return;
 
-    const updatedLead = {
-      ...target,
-      latestEpisode,
-      transcriptSummary
+    const leadAtualizado = {
+      ...alvo,
+      ultimoEpisodio,
+      resumoConversa
     };
 
-    const kit = await generateContentKit({ lead: updatedLead });
+    const kit = await generateContentKit({ lead: leadAtualizado });
 
     setLeads(prev => prev.map(lead => {
       if (lead.id === clientId) {
         return {
           ...lead,
-          latestEpisode,
-          transcriptSummary,
-          sampleKit: kit,
-          history: [
-            ...lead.history,
-            { date: new Date().toLocaleString(), action: `Pacote semanal gerado para "${latestEpisode}"` }
+          ultimoEpisodio,
+          resumoConversa,
+          kitConteudo: kit,
+          historico: [
+            ...lead.historico,
+            `Pacote semanal gerado para "${ultimoEpisodio}".`
           ]
         };
       }
@@ -186,31 +147,27 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex flex-col font-sans selection:bg-emerald-500/30">
-      {/* Top Bar Navigation */}
+    <div className="min-h-screen bg-[#090b10] text-slate-100 flex flex-col font-sans antialiased selection:bg-emerald-500/20 selection:text-emerald-300">
+      {/* Barra Superior Limpa */}
       <Header
-        currency={currency}
-        setCurrency={setCurrency}
         onOpenGuide={() => setShowGuideModal(true)}
         activeTab={activeTab}
         setActiveTab={setActiveTab}
       />
 
-      {/* Funnel Metrics Bar ("Botão de Dinheiro") */}
+      {/* Painel Financeiro & Filtro */}
       <MetricsBar
         leads={leads}
-        currency={currency}
         filterStatus={filterStatus}
         setFilterStatus={setFilterStatus}
       />
 
-      {/* Main Workspace Area */}
-      <main className="flex-1 max-w-5xl w-full mx-auto p-3 sm:p-5 pb-20">
+      {/* Área Central Operacional */}
+      <main className="flex-1 max-w-3xl w-full mx-auto p-4 sm:p-5 pb-24">
         {activeTab === 'pipeline' && (
           <PipelineView
             leads={leads}
             filterStatus={filterStatus}
-            onQualifyLead={handleQualifyLead}
             onGenerateSample={handleGenerateSample}
             onOpenOutreach={(lead) => setOutreachModalLead(lead)}
             onOpenResponseModal={(lead) => setResponseModalLead(lead)}
@@ -218,7 +175,6 @@ export default function App() {
               setSelectedLeadId(lead.id);
               setActiveTab('delivery');
             }}
-            currency={currency}
             isGenerating={isGenerating}
           />
         )}
@@ -245,12 +201,11 @@ export default function App() {
           <DeliveryCenter
             leads={leads}
             onGenerateWeeklyDelivery={handleGenerateWeeklyDelivery}
-            currency={currency}
           />
         )}
       </main>
 
-      {/* Outreach Modal */}
+      {/* Modais de Ação */}
       {outreachModalLead && (
         <OutreachModal
           lead={outreachModalLead}
@@ -259,57 +214,38 @@ export default function App() {
         />
       )}
 
-      {/* Response Classifier Modal */}
       {responseModalLead && (
         <ResponseProcessorModal
           lead={responseModalLead}
           onClose={() => setResponseModalLead(null)}
-          onAdvanceToNegotiating={handleAdvanceToNegotiating}
           onMarkWon={handleMarkWon}
         />
       )}
 
-      {/* Zero Cost Guide Modal */}
       {showGuideModal && (
         <ZeroCostGuideModal
           onClose={() => setShowGuideModal(false)}
         />
       )}
 
-      {/* Mobile Floating Quick Action Dock */}
-      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 max-w-md w-[92%] bg-slate-900/95 backdrop-blur-lg border border-slate-700/80 rounded-2xl p-2 shadow-2xl flex items-center justify-between gap-1 text-[11px] sm:hidden">
-        <button
-          onClick={() => setActiveTab('pipeline')}
-          className={`flex-1 py-1.5 rounded-xl font-bold transition flex flex-col items-center justify-center ${
-            activeTab === 'pipeline' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400'
-          }`}
-        >
-          <span>🎯 Funil</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('hunter')}
-          className={`flex-1 py-1.5 rounded-xl font-bold transition flex flex-col items-center justify-center ${
-            activeTab === 'hunter' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400'
-          }`}
-        >
-          <span>🔍 Buscar</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('factory')}
-          className={`flex-1 py-1.5 rounded-xl font-bold transition flex flex-col items-center justify-center ${
-            activeTab === 'factory' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400'
-          }`}
-        >
-          <span>⚡ Fábrica</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('delivery')}
-          className={`flex-1 py-1.5 rounded-xl font-bold transition flex flex-col items-center justify-center ${
-            activeTab === 'delivery' ? 'bg-emerald-500 text-slate-950 shadow-md' : 'text-slate-400'
-          }`}
-        >
-          <span>📦 Entregar</span>
-        </button>
+      {/* Barra Flutuante Móvel no Rodapé (Perfeita para uso com 1 mão) */}
+      <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-30 max-w-sm w-[90%] bg-slate-900/90 backdrop-blur-md border border-slate-800 rounded-2xl p-1.5 shadow-xl flex items-center justify-between gap-1 text-[11px] sm:hidden">
+        {[
+          { id: 'pipeline', label: 'Vendas' },
+          { id: 'hunter', label: 'Buscar' },
+          { id: 'factory', label: 'Amostras' },
+          { id: 'delivery', label: 'Clientes' }
+        ].map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex-1 py-2 rounded-xl font-medium transition ${
+              activeTab === tab.id ? 'bg-slate-800 text-white font-semibold' : 'text-slate-400'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
     </div>
   );
